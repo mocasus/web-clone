@@ -1,17 +1,17 @@
 {
-  "name": "ai-website-clone-template",
-  "version": "0.3.1",
+  "name": "web-clone",
+  "version": "1.0.0",
   "private": true,
   "description": "Clone any website into a clean, modern Next.js codebase using AI coding agents",
-  "author": "JCodesMore",
+  "author": "mocasus",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/JCodesMore/ai-website-cloner-template.git"
+    "url": "https://github.com/mocasus/web-clone.git"
   },
-  "homepage": "https://github.com/JCodesMore/ai-website-cloner-template",
+  "homepage": "https://github.com/mocasus/web-clone",
   "bugs": {
-    "url": "https://github.com/JCodesMore/ai-website-cloner-template/issues"
+    "url": "https://github.com/mocasus/web-clone/issues"
   },
   "keywords": [
     "claude-code",
