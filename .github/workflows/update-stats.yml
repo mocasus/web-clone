@@ -1,0 +1,32 @@
+name: Update README stats
+
+on:
+  schedule:
+    - cron: '0 0 * * *'  # Daily at 00:00 UTC
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+jobs:
+  update-stats:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Update last-updated badge
+        run: |
+          DATE=$(date -u +"%Y--%m--%d")
+          # No-op placeholder — badges are dynamic via shields.io.
+          # This workflow exists to keep the repo "alive" and surface
+          # last-commit/last-updated activity on GitHub.
+          echo "Last sync: $(date -u)" > .github/last-sync.txt
+
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --staged --quiet || git commit -m "chore: daily sync [skip ci]"
+          git push
