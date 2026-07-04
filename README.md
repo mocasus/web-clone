@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="public/logo.svg" alt="web-clone" width="100" height="100" />
+<img src="public/logo.svg?v=2" alt="web-clone" width="100" height="100" />
 
 # web-clone
 
