@@ -1,7 +1,15 @@
 <svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <rect width="120" height="120" rx="24" fill="#0F172A"/>
-  <path d="M30 38 L60 22 L90 38 L90 74 L60 90 L30 74 Z" stroke="#38BDF8" stroke-width="3" fill="none"/>
-  <path d="M30 38 L60 56 L90 38" stroke="#38BDF8" stroke-width="3" fill="none"/>
-  <line x1="60" y1="56" x2="60" y2="90" stroke="#38BDF8" stroke-width="3"/>
-  <circle cx="60" cy="56" r="4" fill="#38BDF8"/>
+  <rect width="120" height="120" rx="26" fill="#0F172A"/>
+  <!-- Browser window -->
+  <rect x="24" y="30" width="52" height="40" rx="6" stroke="#38BDF8" stroke-width="3" fill="none"/>
+  <line x1="24" y1="42" x2="76" y2="42" stroke="#38BDF8" stroke-width="3"/>
+  <circle cx="32" cy="36" r="2" fill="#38BDF8"/>
+  <circle cx="39" cy="36" r="2" fill="#38BDF8"/>
+  <!-- Clone arrow -->
+  <path d="M64 58 L82 58 L82 88 L46 88 L46 78" stroke="#F97316" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <polyline points="40,82 46,78 52,82" stroke="#F97316" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <!-- Content lines in browser -->
+  <line x1="32" y1="50" x2="52" y2="50" stroke="#38BDF8" stroke-width="2" stroke-linecap="round" opacity="0.5"/>
+  <line x1="32" y1="56" x2="46" y2="56" stroke="#38BDF8" stroke-width="2" stroke-linecap="round" opacity="0.5"/>
+  <line x1="32" y1="62" x2="56" y2="62" stroke="#38BDF8" stroke-width="2" stroke-linecap="round" opacity="0.5"/>
 </svg>
