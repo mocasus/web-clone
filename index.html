@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kuramanime API — Demo</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#121217;color:#e0e0e8;min-height:100vh}
+header{background:#1a1a22;border-bottom:1px solid #2a2a35;padding:14px 20px;position:sticky;top:0;z-index:10;display:flex;align-items:center;gap:14px}
+.logo{width:36px;height:36px;border-radius:10px}
+h1{font-size:18px;font-weight:700;letter-spacing:-.3px}
+h1 span{color:#F06B3E}
+.badge{font-size:11px;background:#F06B3E20;color:#F06B3E;padding:3px 8px;border-radius:4px;font-weight:600}
+main{max-width:1100px;margin:0 auto;padding:24px 20px}
+.toolbar{display:flex;gap:10px;margin-bottom:24px;flex-wrap:wrap}
+.search-box{flex:1;min-width:200px;position:relative}
+.search-box input{width:100%;padding:10px 14px 10px 38px;background:#1a1a22;border:1px solid #2a2a35;border-radius:10px;color:#e0e0e8;font-size:14px;outline:none;transition:border .2s}
+.search-box input:focus{border-color:#F06B3E}
+.search-box::before{content:'🔍';position:absolute;left:12px;top:10px;font-size:14px}
+.search-box .clear{position:absolute;right:10px;top:8px;background:none;border:none;color:#666;cursor:pointer;font-size:16px;display:none}
+.search-box .clear.visible{display:block}
+.stats{display:flex;align-items:center;gap:8px;font-size:13px;color:#888}
+.stats code{background:#1a1a22;padding:3px 8px;border-radius:5px;color:#F06B3E;font-size:12px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px}
+.card{background:#1a1a22;border:1px solid #2a2a35;border-radius:12px;overflow:hidden;cursor:pointer;transition:transform .15s,border-color .15s}
+.card:hover{transform:translateY(-2px);border-color:#F06B3E40}
+.card img{width:100%;height:260px;object-fit:cover;background:#222}
+.card-body{padding:12px 14px}
+.card-body h3{font-size:14px;font-weight:600;line-height:1.3;margin-bottom:8px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.meta{display:flex;gap:10px;font-size:12px;color:#999}
+.meta .score{color:#F06B3E;font-weight:600}
+.meta .views{color:#666}
+.pagination{display:flex;justify-content:center;align-items:center;gap:12px;margin-top:28px}
+.pagination button{padding:8px 16px;background:#1a1a22;border:1px solid #2a2a35;border-radius:8px;color:#ccc;cursor:pointer;font-size:13px;transition:all .15s}
+.pagination button:hover:not(:disabled){border-color:#F06B3E;color:#F06B3E}
+.pagination button:disabled{opacity:.3;cursor:default}
+.page-info{font-size:13px;color:#888}
+.loading{text-align:center;padding:60px;color:#666;font-size:15px}
+.loading .spinner{width:32px;height:32px;border:3px solid #2a2a35;border-top-color:#F06B3E;border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 14px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.error{padding:16px;background:#ff444410;border:1px solid #ff444430;border-radius:10px;color:#ff8888;font-size:14px;text-align:center}
+.empty{text-align:center;padding:40px;color:#666;font-size:14px}
+.modal-overlay{position:fixed;inset:0;background:#000c;z-index:100;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .2s}
+.modal-overlay.open{opacity:1;pointer-events:auto}
+.modal{background:#1a1a22;border:1px solid #2a2a35;border-radius:16px;max-width:640px;width:100%;max-height:85vh;overflow-y:auto;padding:28px;position:relative}
+.modal-close{position:absolute;top:14px;right:14px;background:#2a2a35;border:none;color:#999;width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:16px;line-height:1;transition:all .15s}
+.modal-close:hover{background:#F06B3E;color:#fff}
+.modal h2{font-size:20px;font-weight:700;margin-bottom:4px}
+.modal .alt{font-size:13px;color:#888;margin-bottom:16px}
+.modal .synopsis{font-size:14px;color:#bbb;line-height:1.7;margin-bottom:20px}
+.modal .meta-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;margin-bottom:20px}
+.modal .meta-item{background:#121217;padding:10px 12px;border-radius:8px;font-size:12px}
+.modal .meta-item strong{display:block;color:#888;font-weight:500;margin-bottom:3px}
+.modal .meta-item span{color:#ddd;font-weight:600}
+.episodes{margin-top:8px}
+.episodes h4{font-size:14px;color:#888;margin-bottom:10px;font-weight:500}
+.ep-list{display:flex;flex-wrap:wrap;gap:6px}
+.ep-list button{padding:6px 12px;background:#121217;border:1px solid #2a2a35;border-radius:7px;color:#ccc;cursor:pointer;font-size:12px;transition:all .15s}
+.ep-list button:hover{border-color:#F06B3E;color:#F06B3E}
+footer{text-align:center;padding:30px;color:#555;font-size:12px;border-top:1px solid #2a2a35;margin-top:40px}
+footer a{color:#F06B3E;text-decoration:none}
+.toggle-source{font-size:12px;color:#F06B3E;cursor:pointer;margin-left:auto;padding:6px 10px;background:#F06B3E15;border:none;border-radius:6px}
+@media(max-width:600px){.grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.card img{height:200px}.card-body h3{font-size:12px}.modal{padding:20px}}
+</style>
+</head>
+<body>
+
+<header>
+  <img src="https://raw.githubusercontent.com/mocasus/kuramanime-api/main/assets/logo.jpg" class="logo" alt="Kuramanime" onerror="this.style.display='none'">
+  <h1>Kuramanime<span>API</span></h1>
+  <span class="badge">DEMO</span>
+  <button class="toggle-source" onclick="toggleSource()" title="Toggle source info">🔗</button>
+</header>
+
+<main>
+  <div class="toolbar">
+    <div class="search-box">
+      <input type="text" id="searchInput" placeholder="Search anime..." autocomplete="off">
+      <button class="clear" id="clearBtn" onclick="clearSearch()">✕</button>
+    </div>
+    <div class="stats" id="stats"></div>
+  </div>
+
+  <div id="content"></div>
+  <div class="pagination" id="pagination"></div>
+</main>
+
+<div class="modal-overlay" id="modalOverlay" onclick="if(event.target===this)closeModal()">
+  <div class="modal" id="modal"></div>
+</div>
+
+<footer>
+  Powered by <a href="https://github.com/mocasus/kuramanime-api" target="_blank">Kuramanime API</a> · 
+  <span id="sourceInfo"></span>
+</footer>
+
+<script>
+const API = 'https://kuramanime-api-chi.vercel.app';
+let currentPage = 1;
+let showSource = false;
+
+async function fetchJSON(url) {
+  const res = await fetch(url);
+  return res.json();
+}
+
+async function loadAnime(page = 1) {
+  const content = document.getElementById('content');
+  const pagination = document.getElementById('pagination');
+  content.innerHTML = '<div class="loading"><div class="spinner"></div>Loading anime...</div>';
+  pagination.innerHTML = '';
+
+  try {
+    const data = await fetchJSON(`${API}/api/anime?page=${page}`);
+    currentPage = page;
+    renderCards(data);
+    updateStats(data);
+    renderPagination(data);
+  } catch (e) {
+    content.innerHTML = `<div class="error">Gagal fetch data: ${e.message}</div>`;
+  }
+}
+
+function renderCards(data) {
+  const content = document.getElementById('content');
+  if (!data.data || !data.data.length) {
+    content.innerHTML = '<div class="empty">Ga ada anime ditemukan 🙁</div>';
+    return;
+  }
+
+  let html = '<div class="grid">';
+  data.data.forEach(a => {
+    const title = a.title || 'Untitled';
+    const image = a.image || '';
+    const score = a.score && a.score !== '?' ? a.score : '?';
+    const quality = a.quality ? parseInt(a.quality.replace(/,/g,'')).toLocaleString() : '0';
+    html += `
+      <div class="card" onclick="openDetail('${(a.slug||'').replace(/'/g,"\\'")}')">
+        <img src="${image}" alt="${title}" loading="lazy" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22260%22><rect fill=%22%23222%22 width=%22200%22 height=%22260%22/><text x=%22100%22 y=%22135%22 text-anchor=%22middle%22 fill=%22%23666%22 font-size=%2214%22>No Image</text></svg>'">
+        <div class="card-body">
+          <h3>${title}</h3>
+          <div class="meta">
+            <span class="score">⭐ ${score}</span>
+            <span class="views">👁 ${quality}</span>
+          </div>
+        </div>
+      </div>`;
+  });
+  html += '</div>';
+  content.innerHTML = html;
+}
+
+function renderPagination(data) {
+  const pag = document.getElementById('pagination');
+  const hasPrev = currentPage > 1;
+  const hasNext = data.data && data.data.length >= 5;
+  pag.innerHTML = `
+    <button ${hasPrev?'':'disabled'} onclick="loadAnime(${currentPage-1})">← Prev</button>
+    <span class="page-info">Page ${currentPage}</span>
+    <button ${hasNext?'':'disabled'} onclick="loadAnime(${currentPage+1})">Next →</button>
+  `;
+}
+
+function updateStats(data) {
+  const stats = document.getElementById('stats');
+  const source = showSource && data.source ? data.source : '';
+  stats.innerHTML = source ? `<code>${source}</code>` : `<code>${data.count||0} items</code>`;
+}
+
+function toggleSource() {
+  showSource = !showSource;
+  loadAnime(currentPage);
+}
+
+async function search(e) {
+  const q = e.target.value.trim();
+  const clearBtn = document.getElementById('clearBtn');
+  
+  if (q.length < 2) {
+    clearBtn.classList.remove('visible');
+    if (!q) { loadAnime(1); return; }
+    return;
+  }
+  clearBtn.classList.add('visible');
+
+  const content = document.getElementById('content');
+  const pagination = document.getElementById('pagination');
+  content.innerHTML = '<div class="loading"><div class="spinner"></div>Searching...</div>';
+  pagination.innerHTML = '';
+
+  try {
+    const data = await fetchJSON(`${API}/api/search?q=${encodeURIComponent(q)}`);
+    document.getElementById('stats').innerHTML = `<code>${data.count||0} results for "${q}"</code>`;
+    renderCards(data);
+    pagination.innerHTML = '';
+  } catch (e) {
+    content.innerHTML = `<div class="error">Search error: ${e.message}</div>`;
+  }
+}
+
+function clearSearch() {
+  document.getElementById('searchInput').value = '';
+  document.getElementById('clearBtn').classList.remove('visible');
+  loadAnime(1);
+}
+
+async function openDetail(slug) {
+  const modal = document.getElementById('modal');
+  const overlay = document.getElementById('modalOverlay');
+  modal.innerHTML = '<div class="loading"><div class="spinner"></div>Loading detail...</div>';
+  overlay.classList.add('open');
+
+  try {
+    const data = await fetchJSON(`${API}/api/anime/${slug}`);
+    const d = data.data;
+    const meta = d.metadata || {};
+    const genres = d.genres || [];
+    const episodes = d.episodes || [];
+
+    const metaHTML = Object.entries(meta)
+      .filter(([k]) => !['genre','kredit'].includes(k))
+      .map(([k,v]) => `<div class="meta-item"><strong>${k}</strong><span>${v||'?'}</span></div>`)
+      .join('');
+
+    const epHTML = episodes.length ? `
+      <div class="episodes">
+        <h4>📺 Episodes (${episodes.length})</h4>
+        <div class="ep-list">
+          ${episodes.map(ep => `<button onclick="event.stopPropagation()">Ep ${ep.number}</button>`).join('')}
+        </div>
+      </div>` : '';
+
+    modal.innerHTML = `
+      <button class="modal-close" onclick="closeModal()">✕</button>
+      <h2>${d.title||'Unknown'}</h2>
+      ${d.altTitle?`<div class="alt">${d.altTitle}</div>`:''}
+      ${d.synopsis?`<p class="synopsis">${d.synopsis.slice(0,400)}${d.synopsis.length>400?'...':''}</p>`:''}
+      <div class="meta-grid">${metaHTML}</div>
+      ${genres.length?`<div style="margin-bottom:16px;display:flex;gap:6px;flex-wrap:wrap">${genres.map(g=>`<span style="background:#F06B3E20;color:#F06B3E;padding:4px 10px;border-radius:12px;font-size:12px">${g}</span>`).join('')}</div>`:''}
+      ${epHTML}
+      ${d.score?`<div style="margin-top:12px;font-size:15px;color:#F06B3E;font-weight:700">⭐ ${d.score}</div>`:''}
+    `;
+  } catch (e) {
+    modal.innerHTML = `<div class="error">Gagal load detail: ${e.message}</div>`;
+  }
+}
+
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('open');
+}
+
+// Debounced search
+let searchTimer;
+document.getElementById('searchInput').addEventListener('input', (e) => {
+  clearTimeout(searchTimer);
+  searchTimer = setTimeout(() => search(e), 350);
+});
+
+// Load initial data
+loadAnime(1);
+
+// Update footer source
+fetchJSON(`${API}/api/sources`).then(d => {
+  if (d.success) document.getElementById('sourceInfo').textContent = `Source: ${d.data.primary}`;
+}).catch(()=>{});
+</script>
+</body>
+</html>
